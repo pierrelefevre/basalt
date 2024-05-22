@@ -161,3 +161,4 @@ cython_debug/
 
 # SSH private key
 id_ed25519
+data/
