@@ -1,0 +1,6 @@
+kthcloud>=0.5.0a0
+Flask
+python-dotenv
+uuid
+random-word
+paramiko
