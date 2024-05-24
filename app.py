@@ -132,7 +132,7 @@ def main():
                     vm_uptime = ssh(vm)
                     if vm_uptime:
                         print(f"Uptime: {vm_uptime}")
-                        uptimes[vm.id] = vm_uptime
+                        uptimes[vm.id] = {"name": vm.name, "uptime": vm_uptime}
                 except Exception as e:
                     print(e)
 
