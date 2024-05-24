@@ -103,7 +103,7 @@ def save_state(uptimes):
 def main():
     vms = []
     start = time.time()
-    uptimes = {}
+    uptimes = []
 
     while True:
         vms = client.vms.list()
@@ -136,11 +136,17 @@ def main():
                         last_fetch = components[0].strip()
                         uptime = components[1].split(",")[0].strip()
 
-                        uptimes[vm.id] = {
-                            "name": vm.name,
-                            "last_fetch": last_fetch,
-                            "uptime": uptime,
-                        }
+                        uptimes = [item for item in uptimes if item.id != vm.id]
+                        uptimes.append(
+                            {
+                                "name": vm.name,
+                                "id": vm.id,
+                                "created_at": vm.created_at,
+                                "status": vm.status,
+                                "last_fetch": last_fetch,
+                                "uptime": uptime,
+                            }
+                        )
                 except Exception as e:
                     print(e)
 
@@ -156,7 +162,7 @@ def get_state():
             {
                 "start_time": start_time,
                 "current_time": datetime.now().isoformat(),
-                "uptimes": uptimes,
+                "uptimes": uptimes.sort(key=lambda u: u["created_at"]),
             },
             indent=2,
         )
