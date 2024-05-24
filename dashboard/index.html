@@ -15,18 +15,26 @@
         }
 
         .container {
-            padding: 20px;
-            max-width: 800px;
+            max-width: 1000px;
             margin-left: auto;
             margin-right: auto;
+            padding: 20px;
+        }
+
+        .machine-list {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            gap: 10px;
         }
 
         .machine {
             border: 1px solid #333;
             padding: 15px;
-            margin: 15px 0;
             border-radius: 5px;
             background-color: #1e1e1e;
+            width: fit-content;
         }
 
         .progress-bar {
@@ -35,6 +43,7 @@
             border-radius: 5px;
             overflow: hidden;
             margin-top: 10px;
+            margin-bottom: 10px;
         }
 
         .progress {
@@ -46,16 +55,20 @@
         h1 {
             color: #4caf50;
         }
+
+        .running {
+            border-top: 2px solid #4caf50;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <h1>Basalt</h1>
-        <div id="machine-list"></div>
         <div class="progress-bar">
             <div class="progress" id="progress"></div>
         </div>
+        <div id="machine-list"></div>
     </div>
     <script>
         const fetchData = () => {
@@ -71,11 +84,11 @@
 
             data.uptimes.forEach(machine => {
                 const machineDiv = document.createElement('div');
-                machineDiv.className = 'machine';
+                machineDiv.className = machine.status === 'resourceRunning' ? 'machine running' : 'machine';
                 machineDiv.innerHTML = `
                     <p>Name: ${machine.name}</p>
                     <p>ID: ${machine.id}</p>
-                    <p>Created At: ${new Date(machine.created_at).toLocaleString()}</p>
+                    <p>Created At: ${machine.created_at.replace("T", " ").replace("Z", " ")}</p>
                     <p>Status: ${machine.status}</p>
                     <p>Last Fetch: ${machine.last_fetch}</p>
                     <p>Uptime: ${machine.uptime}</p>
