@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basalt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .machine {
+            border: 1px solid #333;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            background-color: #1e1e1e;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #333;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress {
+            height: 10px;
+            background-color: #4caf50;
+            width: 0;
+        }
+
+        h1 {
+            color: #4caf50;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Basalt</h1>
+        <div id="machine-list"></div>
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+    </div>
+    <script>
+        const fetchData = () => {
+            fetch('https://basalt-monitor.app.cloud.cbh.kth.se/')
+                .then(response => response.json())
+                .then(data => updateUI(data))
+                .catch(error => console.error('Error fetching data:', error));
+        };
+
+        const updateUI = (data) => {
+            const machineList = document.getElementById('machine-list');
+            machineList.innerHTML = '';
+
+            data.uptimes.forEach(machine => {
+                const machineDiv = document.createElement('div');
+                machineDiv.className = 'machine';
+                machineDiv.innerHTML = `
+                    <p>Name: ${machine.name}</p>
+                    <p>ID: ${machine.id}</p>
+                    <p>Created At: ${new Date(machine.created_at).toLocaleString()}</p>
+                    <p>Status: ${machine.status}</p>
+                    <p>Last Fetch: ${machine.last_fetch}</p>
+                    <p>Uptime: ${machine.uptime}</p>
+                `;
+                machineList.appendChild(machineDiv);
+            });
+        };
+
+        const startProgressBar = () => {
+            const progressBar = document.getElementById('progress');
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    fetchData();
+                    startProgressBar();
+                } else {
+                    width++;
+                    progressBar.style.width = width + '%';
+                }
+            }, 50);
+        };
+
+        fetchData();
+        startProgressBar();
+    </script>
+</body>
+
+</html>
