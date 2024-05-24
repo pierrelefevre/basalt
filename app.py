@@ -5,6 +5,7 @@ import json
 import re
 import paramiko
 import threading
+from datetime import datetime
 from flask import Flask
 from dotenv import load_dotenv
 from kthcloud import Kthcloud
@@ -14,6 +15,7 @@ from random_word import RandomWords
 load_dotenv()
 client = Kthcloud()
 app = Flask(__name__)
+start_time = datetime.now().isoformat()
 
 # Prepare SSH key
 with open("id_ed25519.pub") as f:
@@ -148,7 +150,15 @@ def main():
 @app.route("/")
 def get_state():
     with open("data/state.json") as f:
-        return json.load(f)
+        uptimes = json.load(f)
+        return json.dumps(
+            {
+                "start_time": start_time,
+                "current_time": datetime.now().isoformat(),
+                "uptimes": uptimes,
+            },
+            indent=2,
+        )
 
 
 @app.route("/healthz")
