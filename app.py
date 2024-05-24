@@ -100,18 +100,10 @@ def save_state(uptimes):
         json.dump(uptimes, f, indent=2)
 
 
-def load_state():
-    try:
-        with open("data/state.json") as f:
-            return json.load(f)
-    except:
-        return {}
-
-
 def main():
     vms = []
     start = time.time()
-    uptimes = load_state()
+    uptimes = {}
 
     while True:
         vms = client.vms.list()
