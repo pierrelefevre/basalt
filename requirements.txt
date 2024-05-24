@@ -4,3 +4,4 @@ python-dotenv
 uuid
 random-word
 paramiko
+flask-cors

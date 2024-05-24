@@ -7,6 +7,7 @@ import paramiko
 import threading
 from datetime import datetime
 from flask import Flask, abort
+from flask_cors import CORS
 from dotenv import load_dotenv
 from kthcloud import Kthcloud
 from random_word import RandomWords
@@ -15,6 +16,7 @@ from random_word import RandomWords
 load_dotenv()
 client = Kthcloud()
 app = Flask(__name__)
+CORS(app)
 start_time = datetime.now().isoformat()
 
 # Prepare SSH key
