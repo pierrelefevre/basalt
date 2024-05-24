@@ -138,17 +138,28 @@ def main():
                         last_fetch = components[0].strip()
                         uptime = components[1].split(",")[0].strip()
 
-                        uptimes = [item for item in uptimes if item["id"] != vm.id]
-                        uptimes.append(
-                            {
-                                "name": vm.name,
-                                "id": vm.id,
-                                "created_at": vm.created_at,
-                                "status": vm.status,
-                                "last_fetch": last_fetch,
-                                "uptime": uptime,
-                            }
+                        new_status = {
+                            "name": vm.name,
+                            "id": vm.id,
+                            "created_at": vm.created_at,
+                            "status": vm.status,
+                            "last_fetch": last_fetch,
+                            "uptime": uptime,
+                        }
+
+                        index = next(
+                            (
+                                index
+                                for (index, d) in enumerate(uptimes)
+                                if d["id"] == vm.id
+                            ),
+                            None,
                         )
+
+                        if index is not None:
+                            uptimes[index] = new_status
+                        else:
+                            uptimes.append(new_status)
                 except Exception as e:
                     print(e)
 
