@@ -33,10 +33,10 @@ os.chmod("id_ed25519", 0o600)
 def create_many(n):
     for _ in range(n):
         client.vms.create(
-            cpu_cores=1,
-            disk_size=10,
+            cpu_cores=2,
+            disk_size=64,
             name=RandomWords().get_random_word(),
-            ram=1,
+            ram=4,
             ssh_public_key=ssh_key_pub,
         )
 
