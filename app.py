@@ -6,7 +6,7 @@ import re
 import paramiko
 import threading
 from datetime import datetime
-from flask import Flask
+from flask import Flask, abort
 from dotenv import load_dotenv
 from kthcloud import Kthcloud
 from random_word import RandomWords
@@ -156,16 +156,19 @@ def main():
 
 @app.route("/")
 def get_state():
-    with open("data/state.json") as f:
-        uptimes = json.load(f)
-        return json.dumps(
-            {
-                "start_time": start_time,
-                "current_time": datetime.now().isoformat(),
-                "uptimes": uptimes.sort(key=lambda u: u["created_at"]),
-            },
-            indent=2,
-        )
+    try:
+        with open("data/state.json") as f:
+            uptimes = json.load(f)
+            return json.dumps(
+                {
+                    "start_time": start_time,
+                    "current_time": datetime.now().isoformat(),
+                    "uptimes": uptimes.sort(key=lambda u: u["created_at"]),
+                },
+                indent=2,
+            )
+    except:
+        abort(404)
 
 
 @app.route("/healthz")
