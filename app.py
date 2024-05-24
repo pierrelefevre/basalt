@@ -138,7 +138,7 @@ def main():
                         last_fetch = components[0].strip()
                         uptime = components[1].split(",")[0].strip()
 
-                        uptimes = [item for item in uptimes if item.id != vm.id]
+                        uptimes = [item for item in uptimes if item["id"] != vm.id]
                         uptimes.append(
                             {
                                 "name": vm.name,
