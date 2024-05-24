@@ -1,0 +1,23 @@
+name: kthcloud-ci
+"on":
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: registry.cloud.cbh.kth.se
+          username: ${{ secrets.DASHBOARD_DOCKER_USERNAME }}
+          password: ${{ secrets.DASHBOARD_DOCKER_PASSWORD }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.DASHBOARD_DOCKER_TAG }}
+          file: ./Dockerfile
+          context: "{{defaultContext}}:dashboard"
