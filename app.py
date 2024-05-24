@@ -133,10 +133,8 @@ def main():
                     if vm_uptime:
                         print(f"Uptime: {vm_uptime}")
                         uptimes[vm.id] = vm_uptime
-                    break
                 except Exception as e:
                     print(e)
-                    break
 
         save_state(uptimes)
         time.sleep(5)
