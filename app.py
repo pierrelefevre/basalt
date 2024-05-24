@@ -53,7 +53,7 @@ def ssh(vm):
     ssh_client = paramiko.SSHClient()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    match = re.search(r"ssh (\w+)@([\w\.]+) -p (\d+)", vm.sshConnectionString)
+    match = re.search(r"ssh (\w+)@([\w\.]+) -p (\d+)", vm.ssh_connection_string)
     if not match:
         return ""
 
@@ -126,7 +126,7 @@ def main():
         print("Waiting for " + str(int(time.time() - start)) + " seconds")
 
         for vm in vms:
-            if vm.status == "resourceRunning":
+            if vm.ssh_connection_string:
                 try:
                     time.sleep(5)
                     vm_uptime = ssh(vm)
