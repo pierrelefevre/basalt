@@ -41,11 +41,14 @@ def create_many(n):
         )
 
 
-def teardown():
+def teardown(n):
     vms = client.vms.list()
-    n = len(vms)
+    n = 0
     for vm in vms:
+        n += 1
         client.vms.delete(vm.id)
+        if n >= n:
+            break
     print(f"Deleted {n} vms")
 
 
@@ -104,8 +107,6 @@ def load_state():
 
 
 def main():
-    teardown()
-
     vms = []
     start = time.time()
     uptimes = load_state()
@@ -119,7 +120,11 @@ def main():
             desired = int(desired)
             if len(vms) < desired:
                 create_many(desired - len(vms))
-                print(f"Created {desired - len(vms)} VMs")
+                print(f"Adjust - Created {desired - len(vms)} VMs")
+                time.sleep(15)
+            elif len(vms) > desired:
+                teardown(len(vms) - desired)
+                print(f"Adjust - Deleted {len(vms) - desired} VMs")
                 time.sleep(15)
 
         print_statuses(vms)
