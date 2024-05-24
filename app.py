@@ -4,6 +4,8 @@ import time
 import json
 import re
 import paramiko
+import threading
+from flask import Flask
 from dotenv import load_dotenv
 from kthcloud import Kthcloud
 from random_word import RandomWords
@@ -11,6 +13,7 @@ from random_word import RandomWords
 # Setup
 load_dotenv()
 client = Kthcloud()
+app = Flask(__name__)
 
 # Prepare SSH key
 with open("id_ed25519.pub") as f:
@@ -22,6 +25,9 @@ if not os.path.exists("id_ed25519"):
         + os.getenv("ENC_KEY")
     )
     subprocess.run(command, shell=True, check=True)
+
+# Set permissions for keyfile
+os.chmod("id_ed25519", 0o600)
 
 
 def create_many(n):
@@ -37,9 +43,10 @@ def create_many(n):
 
 def teardown():
     vms = client.vms.list()
+    n = len(vms)
     for vm in vms:
         client.vms.delete(vm.id)
-        print(f"Deleted {vm.id}")
+    print(f"Deleted {n} vms")
 
 
 def ssh(vm):
@@ -55,10 +62,8 @@ def ssh(vm):
     port = match.group(3)
     print(f"SSH with {username}@{hostname} -p {port}")
 
-    private_key = paramiko.Ed25519Key(filename="id_ed25519")
-
     ssh_client.connect(
-        hostname=hostname, port=int(port), username=username, pkey=private_key
+        hostname=hostname, port=int(port), username=username, key_filename="id_ed25519"
     )
 
     stdin, stdout, stderr = ssh_client.exec_command("uptime")
@@ -85,18 +90,38 @@ def print_statuses(vms):
     print(output)
 
 
+def save_state(uptimes):
+    with open("data/state.json", "w") as f:
+        json.dump(uptimes, f, indent=2)
+
+
+def load_state():
+    try:
+        with open("data/state.json") as f:
+            return json.load(f)
+    except:
+        return {}
+
+
 def main():
-    # Clean
     teardown()
 
-    # Create VMs
-    create_many(1)
-
     vms = []
-    done = False
     start = time.time()
-    while not done:
+    uptimes = load_state()
+
+    while True:
         vms = client.vms.list()
+
+        desired = os.getenv("DESIRED_VMS")
+
+        if desired:
+            desired = int(desired)
+            if len(vms) < desired:
+                create_many(desired - len(vms))
+                print(f"Created {desired - len(vms)} VMs")
+                time.sleep(15)
+
         print_statuses(vms)
         print("Waiting for " + str(int(time.time() - start)) + " seconds")
 
@@ -104,18 +129,32 @@ def main():
             if vm.status == "resourceRunning":
                 try:
                     time.sleep(5)
-                    print(ssh(vm))
-                    done = True
+                    vm_uptime = ssh(vm)
+                    if vm_uptime:
+                        print(f"Uptime: {vm_uptime}")
+                        uptimes[vm.id] = vm_uptime
                     break
                 except Exception as e:
                     print(e)
                     break
 
+        save_state(uptimes)
         time.sleep(5)
 
-    # Clean again
-    teardown()
+
+@app.route("/")
+def get_state():
+    with open("data/state.json") as f:
+        return json.load(f)
+
+
+@app.route("/healthz")
+def healthz():
+    return "OK"
 
 
 if __name__ == "__main__":
-    main()
+    thread = threading.Thread(target=main)
+    thread.start()
+
+    app.run(host="0.0.0.0", port=8080)
