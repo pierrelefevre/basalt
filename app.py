@@ -159,11 +159,12 @@ def get_state():
     try:
         with open("data/state.json") as f:
             uptimes = json.load(f)
+            uptimes.sort(key=lambda u: u["created_at"]),
             return json.dumps(
                 {
                     "start_time": start_time,
                     "current_time": datetime.now().isoformat(),
-                    "uptimes": uptimes.sort(key=lambda u: u["created_at"]),
+                    "uptimes": uptimes,
                 },
                 indent=2,
             )
