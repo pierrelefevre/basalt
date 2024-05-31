@@ -4,71 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Basalt</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #e0e0e0;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 20px;
-        }
-
-        .machine-list {
-            width: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            flex-direction: row;
-            gap: 10px;
-        }
-
-        .machine {
-            border: 1px solid #333;
-            padding: 15px;
-            border-radius: 5px;
-            background-color: #1e1e1e;
-            width: fit-content;
-        }
-
-        .progress-bar {
-            width: 100%;
-            background-color: #333;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 10px;
-            margin-bottom: 10px;
-        }
-
-        .progress {
-            height: 10px;
-            background-color: #4caf50;
-            width: 0;
-        }
-
-        h1 {
-            color: #4caf50;
-        }
-
-        .running {
-            border-top: 2px solid #4caf50;
-        }
-    </style>
 </head>
 
-<body>
+<body class="bg-gray-950 text-white w-100 p-3 flex flex-col items-center">
     <div class="container">
-        <h1>Basalt</h1>
-        <div class="progress-bar">
-            <div class="progress" id="progress"></div>
+        <h1 class="text-3xl mb-3">Basalt</h1>
+        <div class="w-100 bg-gray-800 mb-6">
+            <div class="h-1.5 bg-green-500" id="progress"></div>
         </div>
-        <div id="machine-list"></div>
+        <div id="machine-list" class="flex flex-wrap gap-5 justify-start"></div>
     </div>
     <script>
         const fetchData = () => {
@@ -84,15 +30,9 @@
 
             data.uptimes.forEach(machine => {
                 const machineDiv = document.createElement('div');
-                machineDiv.className = machine.status === 'resourceRunning' ? 'machine running' : 'machine';
-                machineDiv.innerHTML = `
-                    <p>Name: ${machine.name}</p>
-                    <p>ID: ${machine.id}</p>
-                    <p>Created At: ${machine.created_at.replace("T", " ").replace("Z", " ")}</p>
-                    <p>Status: ${machine.status}</p>
-                    <p>Last Fetch: ${machine.last_fetch}</p>
-                    <p>Uptime: ${machine.uptime}</p>
-                `;
+                machineDiv.className = "max-w-80 min-w-80 p-3 bg-gray-900 border-4 border-gray-900 " + (machine.status === 'resourceRunning' ? 'border-t-green-500' : 'border-t-red-500');
+                machineDiv.innerHTML = `<ul class="text-gray-300"><li>${machine.name}</li><li>${machine.status.replace("resource", "")}</li><li class="text-white font-bold">Up ${machine.uptime}</li><li class="text-sm">${machine.id}</li><li class="text-sm">${new Date(machine.created_at).toLocaleString("sv")}</li></ul>`;
+
                 machineList.appendChild(machineDiv);
             });
         };
