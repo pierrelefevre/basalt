@@ -31,7 +31,7 @@
             data.uptimes.forEach(machine => {
                 const machineDiv = document.createElement('div');
                 machineDiv.className = "max-w-80 min-w-80 p-3 bg-gray-900 border-4 border-gray-900 " + (machine.status === 'resourceRunning' ? 'border-t-green-500' : 'border-t-red-500');
-                machineDiv.innerHTML = `<ul class="text-gray-300"><li>${machine.name}</li><li>${machine.status.replace("resource", "")}</li><li class="text-white font-bold">Up ${machine.uptime}</li><li class="text-sm">${machine.id}</li><li class="text-sm">${new Date(machine.created_at).toLocaleString("sv")}</li></ul>`;
+                machineDiv.innerHTML = `<ul class="text-gray-300"><li class="text-sm">${machine.name}</li><li class="text-sm">${machine.status.replace("resource", "")}</li><li class="text-white font-bold">Up ${machine.uptime}</li><li class="text-sm">${machine.id}</li><li class="text-sm">${new Date(machine.created_at).toLocaleString("sv")}</li></ul>`;
 
                 machineList.appendChild(machineDiv);
             });
